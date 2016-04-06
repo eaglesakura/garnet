@@ -42,16 +42,17 @@ class InternalUtils {
         }
     }
 
+    private static Map<Class, InjectionImpl> sImplCache = new HashMap<>();
+
     static synchronized InjectionImpl getImpl(Object obj) {
         Class clazz = obj.getClass();
-//        InjectionImpl impl;
-//        impl = sImplCache.get(clazz);
-//        if (impl == null) {
-//            impl = new InjectionImpl(clazz);
-//            sImplCache.put(clazz, impl);
-//        }
-
-        return new InjectionImpl(clazz);
+        InjectionImpl impl = sImplCache.get(clazz);
+        if (impl == null) {
+            impl = new InjectionImpl(clazz);
+            sImplCache.put(clazz, impl);
+        }
+        return impl;
+//        return new InjectionImpl(clazz);
     }
 
     /**
@@ -104,6 +105,9 @@ class InternalUtils {
     static void override(Class origin, Class stead) {
         synchronized (sOverrideClasses) {
             sOverrideClasses.put(origin, stead);
+            synchronized (sImplCache) {
+                sImplCache.clear();
+            }
         }
     }
 

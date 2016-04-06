@@ -21,8 +21,6 @@ class InjectionImpl {
     @NonNull
     final Class mClass;
 
-    Method mGetContext;
-
     List<Pair<Field, InstanceCreator>> mCreators = new ArrayList<>();
 
     public InjectionImpl(@NonNull Class aClass) {
@@ -53,25 +51,6 @@ class InjectionImpl {
         } catch (Exception e) {
             throw new InjectTargetError(e);
         }
-
-        try {
-            mGetContext = mClass.getMethod("getContext");
-        } catch (Exception e) {
-        }
-    }
-
-    public Context getContext(Object dst) {
-        try {
-            if (mGetContext != null) {
-                return (Context) mGetContext.invoke(dst);
-            }
-
-            if (dst instanceof Context) {
-                return (Context) dst;
-            }
-        } catch (Throwable e) {
-        }
-        return null;
     }
 
     public void inject(Object dst) {

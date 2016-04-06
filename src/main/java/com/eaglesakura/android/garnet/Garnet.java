@@ -1,19 +1,11 @@
 package com.eaglesakura.android.garnet;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 簡易的な依存性注入を行う
  */
 public class Garnet {
-    public static Context getContext(@NonNull Object obj) {
-        return InternalUtils.getImpl(obj).getContext(obj);
-    }
-
     /**
      * 依存注入を行う
      */
