@@ -1,0 +1,31 @@
+checkout:
+  post:
+    - chmod 755 ./gradlew
+machine:
+  timezone:
+    Asia/Tokyo
+  java:
+    version: oraclejdk8
+  environment:
+    ANDROID_HOME: /home/ubuntu/android-sdk
+    BUILD_CACHEDIR: /home/ubuntu/build-cache
+    GRADLE_OPTS: -Xmx2G -Dorg.gradle.daemon=true
+    JAVA_OPTS: -Dfile.encoding=UTF-8 -Xms1024m -Xmx2048m -XX:MaxPermSize=2048m
+dependencies:
+  cache_directories:
+    - "/home/ubuntu/android-sdk"
+    - "/home/ubuntu/build-cache"
+  override:
+    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-android-dependencies.sh)"
+test:
+  override:
+    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-test.sh)"
+deployment:
+  canary:
+    branch: /^v[0-9]\..*$/
+    commands:
+    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-deploy-maven.sh)"
+  develop:
+    branch: develop
+    commands:
+    - sh -c "$(curl -fsSL https://raw.githubusercontent.com/eaglesakura/build-dependencies/master/circleci/build-deploy-local.sh)"
