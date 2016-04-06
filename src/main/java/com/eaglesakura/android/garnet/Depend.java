@@ -6,12 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
-public @interface Inject {
+@Target({ElementType.METHOD})
+public @interface Depend {
     /**
-     * ファクトリを使用する場合はClassを指定する
+     * 型が衝突した場合にチェックされる名前
      */
-    Class<? extends Provider> value();
-
     String name() default "";
+
+    /**
+     * バインドを強要する
+     */
+    boolean require() default false;
 }

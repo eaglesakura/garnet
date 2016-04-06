@@ -10,9 +10,4 @@ public interface Lazy<T> {
      * 値を取得する
      */
     T get();
-
-    /**
-     * 値を削除する
-     */
-    void clear();
 }

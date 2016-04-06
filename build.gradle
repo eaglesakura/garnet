@@ -1,7 +1,8 @@
 /**
  * 0.1.x  : 実験バージョン
+ * 0.2.x  : 多:多の関係でオブジェクトの生成を行う
  */
-def ARTIFACT_VERSION = "0.1"
+def ARTIFACT_VERSION = "0.2"
 def ARTIFACT_NAME = file(".").absoluteFile.name
 def ARTIFACT_INSTALL_TARGET = getArtifactInstallTarget()
 

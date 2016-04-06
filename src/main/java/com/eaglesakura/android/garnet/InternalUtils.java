@@ -1,81 +1,9 @@
 package com.eaglesakura.android.garnet;
 
-import com.eaglesakura.android.garnet.error.InjectTargetError;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 class InternalUtils {
-
-    private static Map<Class, InstanceCreator> sInstanceCreators = new HashMap<>();
-
-    static synchronized InstanceCreator getCreator(Inject inject) {
-        synchronized (sInstanceCreators) {
-            Class clazz;
-            if (!inject.instance().equals(Object.class)) {
-                // インスタンスを直接生成する
-                clazz = getClass(inject.instance());
-                InstanceCreator creator = sInstanceCreators.get(clazz);
-                if (creator == null) {
-                    creator = new InstanceCreatorImpl(clazz);
-                    sInstanceCreators.put(clazz, creator);
-                }
-
-                return creator;
-            } else if (!inject.factory().equals(ComponentFactory.class)) {
-                // ファクトリを経由して生成する
-                clazz = getClass(inject.factory());
-                InstanceCreator creator = sInstanceCreators.get(clazz);
-                if (creator == null) {
-                    creator = new FactoryCreatorImpl(clazz);
-                    sInstanceCreators.put(clazz, creator);
-                }
-
-                return creator;
-            } else {
-                throw new InjectTargetError();
-            }
-        }
-    }
-
-    private static Map<Class, InjectionImpl> sImplCache = new HashMap<>();
-
-    static synchronized InjectionImpl getImpl(Object obj) {
-        Class clazz = obj.getClass();
-        InjectionImpl impl = sImplCache.get(clazz);
-        if (impl == null) {
-            impl = new InjectionImpl(clazz);
-            sImplCache.put(clazz, impl);
-        }
-        return impl;
-//        return new InjectionImpl(clazz);
-    }
-
-    /**
-     * 指定したAnnotationが含まれたフィールド(public以外を含む)一覧を返す
-     *
-     * AnnotationにはRuntime属性が付与されてなければならない
-     */
-    static <T extends Annotation> List<Field> listAnnotationFields(Class srcClass, Class<T> annotationClass) {
-        List<Field> result = new ArrayList<>();
-
-        while (!srcClass.equals(Object.class)) {
-            for (Field field : srcClass.getDeclaredFields()) {
-                T annotation = field.getAnnotation(annotationClass);
-                if (annotation != null) {
-                    result.add(field);
-                }
-            }
-
-            srcClass = srcClass.getSuperclass();
-        }
-
-        return result;
-    }
 
     private static final Map<Class, SingletonHolder> sSingletonStore = new HashMap<>();
 
@@ -105,9 +33,6 @@ class InternalUtils {
     static void override(Class origin, Class stead) {
         synchronized (sOverrideClasses) {
             sOverrideClasses.put(origin, stead);
-            synchronized (sImplCache) {
-                sImplCache.clear();
-            }
         }
     }
 
