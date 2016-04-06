@@ -2,6 +2,8 @@ package com.eaglesakura.android.garnet;
 
 import android.support.annotation.NonNull;
 
+import java.lang.reflect.Field;
+
 class LazyCreatorImpl implements InstanceCreator {
 
     @NonNull
@@ -12,24 +14,27 @@ class LazyCreatorImpl implements InstanceCreator {
     }
 
     @Override
-    public Object newInstance(Object dst) {
-        return new LazyImpl(dst);
+    public Object newInstance(Field field, Object dst) {
+        return new LazyImpl(dst, field);
     }
 
     @Override
-    public void initialize(Object instance, Object dst) {
+    public void initialize(Field field, Object instance, Object dst) {
 
     }
 
     class LazyImpl implements Lazy {
         Object mItem;
 
+        final Field mField;
+
         boolean mInitialized;
 
         final Object mDst;
 
-        public LazyImpl(Object dst) {
+        public LazyImpl(Object dst, Field field) {
             mDst = dst;
+            mField = field;
         }
 
         @Override
@@ -37,8 +42,8 @@ class LazyCreatorImpl implements InstanceCreator {
             if (!mInitialized) {
                 synchronized (this) {
                     if (!mInitialized) {
-                        mItem = mCreator.newInstance(mDst);
-                        mCreator.initialize(mItem, mDst);
+                        mItem = mCreator.newInstance(mField, mDst);
+                        mCreator.initialize(mField, mItem, mDst);
                         mInitialized = true;
                     }
                 }

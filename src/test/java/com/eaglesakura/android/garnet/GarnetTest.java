@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class GarnetTest extends UnitTestCase {
@@ -54,8 +55,11 @@ public class GarnetTest extends UnitTestCase {
         assertNull(testInstance.obj);
 
         Garnet.override(SayFactory.class, SayFactory2.class);   // 動作クラスを上書きする
+        assertEquals(InternalUtils.getClass(SayFactory.class), SayFactory2.class);
+
         Garnet.inject(testInstance);
         Garnet.override(SayFactory.class, SayFactory.class);    // 動作クラスを元に戻す
+        assertEquals(InternalUtils.getClass(SayFactory.class), SayFactory.class);
 
         assertNotNull(testInstance.obj);
         assertNotEquals(testInstance.obj.getClass(), SayObject.class);
@@ -93,6 +97,48 @@ public class GarnetTest extends UnitTestCase {
 
         Garnet.inject(testInstance);
         fail(); // 成功してはならない
+    }
+
+    @Test
+    public void インスタンスのシングルトン設定が反映される() {
+        SingletonInstanceCase instanceA = new SingletonInstanceCase();
+        SingletonInstanceCase instanceB = new SingletonInstanceCase();
+
+        assertNull(instanceA.obj);
+        assertNull(instanceB.obj);
+
+        Garnet.inject(instanceA);
+        Garnet.inject(instanceB);
+
+        // 注入が行われる
+        assertNotNull(instanceA.obj);
+        assertNotNull(instanceB.obj);
+
+        // 同じオブジェクトである
+        assertEquals(instanceA.obj, instanceB.obj);
+        assertTrue(instanceA.obj == instanceB.obj);
+        assertEquals(instanceA.obj.hello(), instanceB.obj.hello());
+    }
+
+    @Test
+    public void ファクトリのシングルトン設定が反映される() {
+        SingletonFactoryCase instanceA = new SingletonFactoryCase();
+        SingletonFactoryCase instanceB = new SingletonFactoryCase();
+
+        assertNull(instanceA.obj);
+        assertNull(instanceB.obj);
+
+        Garnet.inject(instanceA);
+        Garnet.inject(instanceB);
+
+        // 注入が行われる
+        assertNotNull(instanceA.obj);
+        assertNotNull(instanceB.obj);
+
+        // 同じオブジェクトである
+        assertEquals(instanceA.obj, instanceB.obj);
+        assertTrue(instanceA.obj == instanceB.obj);
+        assertEquals(instanceA.obj.hello(), instanceB.obj.hello());
     }
 
     public static class SayObject {
@@ -160,6 +206,37 @@ public class GarnetTest extends UnitTestCase {
         }
     }
 
+    @Singleton
+    public static class SaySingleton extends SayObject {
+        @Override
+        public String hello() {
+            return super.hello() + "." + hashCode();
+        }
+    }
+
+    @Singleton
+    public static class SaySingletonFactory implements ComponentFactory<SayObject, Object> {
+        int mInitCount = 0;
+
+        @Override
+        public SayObject newInstance(Field field, Object o) {
+            return new SayObject() {
+                @Override
+                public String hello() {
+                    return super.hello() + ".factory." + hashCode();
+                }
+            };
+        }
+
+        @Override
+        public void initialize(Field field, Object o, SayObject obj) {
+            // 初期化が行われるのは一度だけである
+            assertNotNull(obj);
+            assertEquals(mInitCount, 0);
+            mInitCount++;
+        }
+    }
+
     public static class LazyInstanceCase {
         @Inject(instance = SayObject.class)
         Lazy<SayObject> lazyObj;
@@ -183,6 +260,11 @@ public class GarnetTest extends UnitTestCase {
         SayObject obj;
     }
 
+    public static class OverrideFactoryInstanceCase {
+        @Inject(factory = SayFactory.class)
+        SayObject obj;
+    }
+
     public static class NullFactoryInstanceCase {
         @Inject(factory = SayNullFactory.class)
         SayObject obj;
@@ -191,6 +273,16 @@ public class GarnetTest extends UnitTestCase {
 
     public static class ErrorInstanceCase {
         @Inject(instance = Say2Object.class)
+        SayObject obj;
+    }
+
+    public static class SingletonInstanceCase {
+        @Inject(instance = SaySingleton.class)
+        SayObject obj;
+    }
+
+    public static class SingletonFactoryCase {
+        @Inject(factory = SaySingletonFactory.class)
         SayObject obj;
     }
 }

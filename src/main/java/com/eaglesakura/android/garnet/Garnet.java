@@ -10,30 +10,15 @@ import java.util.Map;
  * 簡易的な依存性注入を行う
  */
 public class Garnet {
-
-    private static final Map<Class, InjectionImpl> sImplCache = new HashMap<>();
-
-    static synchronized InjectionImpl getImpl(Object obj) {
-        InjectionImpl impl;
-        Class clazz = obj.getClass();
-        impl = sImplCache.get(clazz);
-        if (impl == null) {
-            impl = new InjectionImpl(clazz);
-            sImplCache.put(clazz, impl);
-        }
-
-        return impl;
-    }
-
     public static Context getContext(@NonNull Object obj) {
-        return getImpl(obj).getContext(obj);
+        return InternalUtils.getImpl(obj).getContext(obj);
     }
 
     /**
      * 依存注入を行う
      */
     public static <T> T inject(@NonNull T obj) {
-        getImpl(obj).inject(obj);
+        InternalUtils.getImpl(obj).inject(obj);
         return obj;
     }
 
@@ -46,5 +31,4 @@ public class Garnet {
     public static void override(Class origin, Class stead) {
         InternalUtils.override(origin, stead);
     }
-
 }

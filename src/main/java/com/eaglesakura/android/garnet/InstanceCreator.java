@@ -1,7 +1,9 @@
 package com.eaglesakura.android.garnet;
 
-interface InstanceCreator {
-    Object newInstance(Object dst);
+import java.lang.reflect.Field;
 
-    void initialize(Object instance, Object dst);
+interface InstanceCreator {
+    Object newInstance(Field field, Object dst);
+
+    void initialize(Field field, Object instance, Object dst);
 }

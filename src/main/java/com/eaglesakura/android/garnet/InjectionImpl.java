@@ -38,17 +38,9 @@ class InjectionImpl {
                     field.setAccessible(true);
                 }
 
-                InstanceCreator creator;
                 Inject inject = field.getAnnotation(Inject.class);
-                if (!inject.instance().equals(Object.class)) {
-                    // インスタンスを直接生成する
-                    creator = new InstanceCreatorImpl(InternalUtils.getClass(inject.instance()));
-                } else if (!inject.factory().equals(ComponentFactory.class)) {
-                    // ファクトリを経由して生成する
-                    creator = new FactoryCreatorImpl(InternalUtils.getClass(inject.factory()), field);
-                } else {
-                    throw new InjectTargetError();
-                }
+                InstanceCreator creator = InternalUtils.getCreator(inject);
+
                 // 遅延実行する
                 if (field.getType().equals(Lazy.class)) {
                     mCreators.add(new Pair<>(field, new LazyCreatorImpl(creator)));
@@ -85,13 +77,13 @@ class InjectionImpl {
     public void inject(Object dst) {
         try {
             for (Pair<Field, InstanceCreator> creator : mCreators) {
-                Object instance = creator.second.newInstance(dst);
+                Object instance = creator.second.newInstance(creator.first, dst);
                 creator.first.set(dst, instance);
             }
 
             for (Pair<Field, InstanceCreator> creator : mCreators) {
                 Object instance = creator.first.get(dst);
-                creator.second.initialize(instance, dst);
+                creator.second.initialize(creator.first, instance, dst);
             }
         } catch (Exception e) {
             throw new Error(e);
