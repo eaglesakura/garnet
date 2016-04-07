@@ -7,6 +7,7 @@ import com.eaglesakura.android.garnet.error.ProvideMethodNotFoundError;
 
 import android.support.annotation.NonNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -144,6 +145,8 @@ class ProviderClassHolder {
                 // 通常のProvide
                 return method.method.invoke(provider);
             }
+        } catch (InvocationTargetException e) {
+            throw new ProvideMethodError(e.getTargetException());
         } catch (Exception e) {
             throw new ProvideMethodError(e);
         }
