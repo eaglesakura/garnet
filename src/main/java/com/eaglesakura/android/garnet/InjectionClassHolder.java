@@ -5,7 +5,6 @@ import com.eaglesakura.android.garnet.error.InstanceCreateError;
 import com.eaglesakura.android.garnet.error.ProvideMethodError;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -95,7 +94,7 @@ class InjectionClassHolder {
 
                     FieldHolder holder = new FieldHolder();
                     holder.field = field;
-                    holder.providers = inject.value();
+                    holder.provider = inject.value();
                     holder.name = ProviderClassHolder.makeName(getInstanceType(field), inject);
                     mTargetFields.add(holder);
                     addProvider(inject.value());
@@ -144,7 +143,7 @@ class InjectionClassHolder {
         List<Provider> result = new ArrayList<>();
         for (Class clazz : mProviders) {
             try {
-                result.add((Provider) clazz.newInstance());
+                result.add((Provider) InternalUtils.getClass(clazz).newInstance());
             } catch (Exception e) {
                 throw new InstanceCreateError(e);
             }
@@ -154,7 +153,7 @@ class InjectionClassHolder {
 
     void apply(Object inject, ProviderClassHolder providerClassHolder, Provider provider) {
         for (FieldHolder fieldHolder : mTargetFields) {
-            if (!fieldHolder.providers.equals(provider.getClass())) {
+            if (!InternalUtils.getClass(fieldHolder.provider).equals(provider.getClass())) {
                 continue;
             }
 
@@ -175,7 +174,7 @@ class InjectionClassHolder {
     }
 
     static class FieldHolder {
-        Class<? extends Provider> providers;
+        Class<? extends Provider> provider;
 
         String name;
 

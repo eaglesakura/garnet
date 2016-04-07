@@ -11,7 +11,10 @@ import java.util.Map;
  */
 public class Garnet {
 
-    static Builder create(@NonNull Object obj) {
+    /**
+     * 依存注入用のBuilderを生成する
+     */
+    public static Builder create(@NonNull Object obj) {
         return new Builder(obj);
     }
 
@@ -24,12 +27,12 @@ public class Garnet {
     }
 
     /**
-     * 動作クラスを上書きする
+     * Providerを強制的に切り替える
      *
      * @param origin 元のClass
      * @param stead  今後利用するClass
      */
-    public static void override(Class origin, Class stead) {
+    public static void override(Class<? extends Provider> origin, Class<? extends Provider> stead) {
         InternalUtils.override(origin, stead);
     }
 

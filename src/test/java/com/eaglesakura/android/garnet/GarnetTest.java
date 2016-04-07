@@ -18,6 +18,19 @@ public class GarnetTest extends UnitTestCase {
     }
 
     @Test
+    public void Providerの上書きに対応する() {
+        SimpleInjectionTarget target = new SimpleInjectionTarget();
+        assertNull(target.mSay);
+
+        Garnet.override(SayProvider.class, SayJapaneseProvider.class);
+        Garnet.inject(target);
+        Garnet.override(SayProvider.class, SayProvider.class);
+
+        assertNotNull(target.mSay);
+        assertEquals(target.mSay.hello(), "こんにちは");
+    }
+
+    @Test
     public void 名前でバインドしたPrivderを通してインスタンス化できる() {
         NamedInjectionTarget target = new NamedInjectionTarget();
         assertNull(target.mSayEng);
@@ -117,6 +130,24 @@ public class GarnetTest extends UnitTestCase {
         @Provide
         Say provideSay() {
             return () -> "hello";
+        }
+    }
+
+    public static class SayJapaneseProvider implements Provider {
+
+        @Override
+        public void onDependsCompleted(Object inject) {
+
+        }
+
+        @Override
+        public void onInjectCompleted(Object inject) {
+
+        }
+
+        @Provide
+        Say provideSay() {
+            return () -> "こんにちは";
         }
     }
 
