@@ -52,7 +52,11 @@ public class Garnet {
 
         Builder(DstType inject) {
             mInject = inject;
-            mInjectionClassHolder = InjectionClassHolder.get(inject.getClass());
+            if (inject instanceof Class) {
+                mInjectionClassHolder = InjectionClassHolder.get((Class) inject);
+            } else {
+                mInjectionClassHolder = InjectionClassHolder.get(inject.getClass());
+            }
             mProviders = mInjectionClassHolder.newProviders();
             mDependValues = mInjectionClassHolder.getDependValues(inject);
         }

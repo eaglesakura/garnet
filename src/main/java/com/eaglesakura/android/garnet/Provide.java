@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 /**
  * オブジェクトの生成を行う
  *
- * このアノテーションが付いたメソッドは必ず引数なしである必要がある。
+ * 必須：
+ *  * public属性メソッド
+ *  * 引数なしでオブジェクトを返却する
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

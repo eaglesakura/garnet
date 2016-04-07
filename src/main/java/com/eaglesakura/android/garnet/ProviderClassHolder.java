@@ -3,6 +3,7 @@ package com.eaglesakura.android.garnet;
 import com.eaglesakura.android.garnet.error.DependMethodNotFoundError;
 import com.eaglesakura.android.garnet.error.InstanceInitializeException;
 import com.eaglesakura.android.garnet.error.ProvideMethodError;
+import com.eaglesakura.android.garnet.error.ProvideMethodNotFoundError;
 
 import android.support.annotation.NonNull;
 
@@ -121,7 +122,8 @@ class ProviderClassHolder {
     Object getProvideObject(Provider provider, String name) {
         ProvideMethodHolder method = mProvideGetters.get(name);
         if (method == null) {
-            throw new ProvideMethodError(name);
+            // 指定されたProvideメソッドが見つからない
+            throw new ProvideMethodNotFoundError(name);
         }
 
         try {
