@@ -18,8 +18,9 @@ public class Garnet {
     /**
      * 依存注入を行う
      */
-    public static void inject(@NonNull Object obj) {
+    public static <T> T inject(@NonNull T obj) {
         create(obj).inject();
+        return obj;
     }
 
     /**
@@ -32,10 +33,10 @@ public class Garnet {
         InternalUtils.override(origin, stead);
     }
 
-    public static class Builder {
+    public static class Builder<DstType> {
         final InjectionClassHolder mInjectionClassHolder;
 
-        final Object mInject;
+        final DstType mInject;
 
         /**
          * Inject対象から取得した依存オブジェクト
@@ -46,7 +47,7 @@ public class Garnet {
          */
         final List<Provider> mProviders;
 
-        Builder(Object inject) {
+        Builder(DstType inject) {
             mInject = inject;
             mInjectionClassHolder = InjectionClassHolder.get(inject.getClass());
             mProviders = mInjectionClassHolder.newProviders();
@@ -63,7 +64,7 @@ public class Garnet {
             return this;
         }
 
-        public void inject() {
+        public DstType inject() {
             // Providerに依存オブジェクトを設定する
             for (Provider provider : mProviders) {
                 ProviderClassHolder holder = ProviderClassHolder.get(provider.getClass());
@@ -75,6 +76,8 @@ public class Garnet {
             for (Provider provider : mProviders) {
                 provider.onInjectCompleted(mInject);
             }
+
+            return mInject;
         }
     }
 }

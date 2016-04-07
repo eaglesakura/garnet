@@ -9,6 +9,8 @@ import android.support.v4.util.Pair;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -94,7 +96,7 @@ class InjectionClassHolder {
                     FieldHolder holder = new FieldHolder();
                     holder.field = field;
                     holder.providers = inject.value();
-                    holder.name = ProviderClassHolder.makeName(field.getType(), inject);
+                    holder.name = ProviderClassHolder.makeName(getInstanceType(field), inject);
                     mTargetFields.add(holder);
                     addProvider(inject.value());
                 }
@@ -105,6 +107,15 @@ class InjectionClassHolder {
             throw e;
         } catch (Exception e) {
             throw new InjectTargetError(e);
+        }
+    }
+
+    private static Class getInstanceType(Field field) {
+        if (field.getType().equals(Lazy.class)) {
+            Type genericType = field.getGenericType();
+            return (Class) ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        } else {
+            return field.getType();
         }
     }
 
@@ -161,9 +172,6 @@ class InjectionClassHolder {
                 throw new ProvideMethodError(e);
             }
         }
-    }
-
-    public void inject(Object dst) {
     }
 
     static class FieldHolder {

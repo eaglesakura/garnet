@@ -11,6 +11,11 @@ class InternalUtils {
      * シングルトン属性である場合はtrue
      */
     static boolean isSingleton(Class clazz) {
+        for (Class ifs : clazz.getInterfaces()) {
+            if (ifs.getAnnotation(Singleton.class) != null) {
+                return true;
+            }
+        }
         return clazz.getAnnotation(Singleton.class) != null;
     }
 
