@@ -145,7 +145,7 @@ class ProviderClassHolder {
                 return method.method.invoke(provider);
             }
         } catch (Exception e) {
-            throw new ProvideMethodError();
+            throw new ProvideMethodError(e);
         }
     }
 
