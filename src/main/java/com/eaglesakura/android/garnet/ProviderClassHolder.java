@@ -92,10 +92,13 @@ class ProviderClassHolder {
             String key = entry.getKey();
             DependMethodHolder methodHolder = entry.getValue();
 
-            if (depends.containsKey(key)) {
-                // 必須であるが、キーが存在しないのはエラーである
+            if (!depends.containsKey(key)) {
                 if (methodHolder.required) {
-                    throw new DependMethodNotFoundError();
+                    // 必須であるが、キーが存在しないのはエラーである
+                    throw new DependMethodNotFoundError(key);
+                } else {
+                    // キーが存在しないならこのキーは無視する
+                    continue;
                 }
             }
 
