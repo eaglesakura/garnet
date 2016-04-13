@@ -1,6 +1,10 @@
 package com.eaglesakura.android.garnet;
 
+import com.eaglesakura.android.garnet.error.DependMethodNotFoundError;
+
 import org.junit.Test;
+
+import android.content.Context;
 
 import static junit.framework.Assert.*;
 
@@ -101,6 +105,40 @@ public class GarnetTest extends UnitTestCase {
         assertTrue(target1.mSay1 == target1.mLazySaySingleton.get());
     }
 
+    @Test(expected = DependMethodNotFoundError.class)
+    public void Dependが足りない場合はエラーとなる() {
+        DependRequireInjectionTarget target = new DependRequireInjectionTarget();
+        Garnet.inject(target);
+
+        fail();
+    }
+
+    @Depend(name = "context2")
+    @Override
+    public Context getContext() {
+        return super.getContext();
+    }
+
+    @Test
+    public void Dependは必須ではない() {
+        {
+            DependInjectionTarget target = new DependInjectionTarget();
+            Garnet.inject(target);
+            assertEquals(target.mSay.hello(), "null");
+        }
+        // depend()メソッドを通じて与える
+        {
+            DependInjectionTarget target = new DependInjectionTarget();
+            Garnet.create(target).depend(Context.class, getContext()).inject();
+            assertFalse(target.mSay.hello().equals("null"));
+        }
+        // @Dependを通じて与える
+        {
+            DependInjectionTargetWithDependGet target = new DependInjectionTargetWithDependGet(getContext());
+            Garnet.inject(target);
+            assertFalse(target.mSay.hello().equals("null"));
+        }
+    }
 
     public interface Say {
         String hello();
@@ -115,7 +153,89 @@ public class GarnetTest extends UnitTestCase {
         Say mSay;
     }
 
+
+    public static class DependRequireInjectionTarget {
+        @Inject(DependRequireSayProvider.class)
+        Say mSay;
+    }
+
+    public static class DependInjectionTarget {
+        @Inject(DependSayProvider.class)
+        Say mSay;
+    }
+
+    public static class DependInjectionTargetWithDependGet {
+        @Inject(DependSayProvider.class)
+        Say mSay;
+
+        Context mContext;
+
+        public DependInjectionTargetWithDependGet(Context context) {
+            mContext = context;
+        }
+
+        @Depend
+        public Context getContext() {
+            return mContext;
+        }
+    }
+
     public static class SayProvider implements Provider {
+
+        @Override
+        public void onDependsCompleted(Object inject) {
+
+        }
+
+        @Override
+        public void onInjectCompleted(Object inject) {
+
+        }
+
+        @Provide
+        Say provideSay() {
+            return () -> "hello";
+        }
+    }
+
+
+    public static class DependSayProvider implements Provider {
+        Context mContext;
+
+        @Depend
+        public void setContext(Context context) {
+            mContext = context;
+        }
+
+        @Depend(name = "context2")
+        public void setContext2(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public void onDependsCompleted(Object inject) {
+
+        }
+
+        @Override
+        public void onInjectCompleted(Object inject) {
+
+        }
+
+        @Provide
+        Say provideSay() {
+            return () -> "" + mContext;
+        }
+    }
+
+
+    public static class DependRequireSayProvider implements Provider {
+        Context mContext;
+
+        @Depend(require = true)
+        public void setContext(Context context) {
+            mContext = context;
+        }
 
         @Override
         public void onDependsCompleted(Object inject) {
