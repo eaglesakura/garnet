@@ -51,12 +51,17 @@ class InjectionClassHolder {
         Class clazz = mClass;
         while (!clazz.equals(Object.class)) {
             for (Method method : clazz.getDeclaredMethods()) {
+                if (method.getReturnType().equals(void.class)) {
+                    // 戻り値voidのメソッドはチェックを行わない
+                    continue;
+                }
+
                 Depend annotation = method.getAnnotation(Depend.class);
                 if (annotation != null) {
                     String name = ProviderClassHolder.makeName(method.getReturnType(), annotation);
                     if (!mDependGetters.containsKey(name)) {
                         Class<?>[] parameterTypes = method.getParameterTypes();
-                        if (parameterTypes.length != 0 || method.getReturnType().equals(void.class)) {
+                        if (parameterTypes.length != 0) {
                             throw new ProvideMethodError();
                         }
                         mDependGetters.put(name, method);
