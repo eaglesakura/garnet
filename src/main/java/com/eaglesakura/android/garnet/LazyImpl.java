@@ -1,7 +1,5 @@
 package com.eaglesakura.android.garnet;
 
-import java.lang.reflect.Field;
-
 class LazyImpl implements Lazy {
     Object mValue;
     InjectionClassHolder.ProviderInstance mProviderInstance;

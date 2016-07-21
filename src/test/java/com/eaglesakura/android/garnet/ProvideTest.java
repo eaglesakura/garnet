@@ -1,11 +1,11 @@
 package com.eaglesakura.android.garnet;
 
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
 import android.content.Context;
+
+import junit.framework.TestCase;
 
 import static junit.framework.Assert.assertEquals;
 
