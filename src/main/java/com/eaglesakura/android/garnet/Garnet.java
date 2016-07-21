@@ -2,7 +2,6 @@ package com.eaglesakura.android.garnet;
 
 import android.support.annotation.NonNull;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +33,13 @@ public class Garnet {
      */
     public static void override(Class<? extends Provider> origin, Class<? extends Provider> stead) {
         InternalUtils.override(origin, stead);
+    }
+
+    /**
+     * Singleton属性が付いているインスタンスのキャッシュを廃棄する
+     */
+    public static void clearSingletonCache() {
+        InternalUtils.clearSingletonCache();
     }
 
     public static class Builder<DstType> {
