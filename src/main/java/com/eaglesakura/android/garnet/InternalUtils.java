@@ -19,6 +19,17 @@ class InternalUtils {
         return clazz.getAnnotation(Singleton.class) != null;
     }
 
+    /**
+     * 保持しているシングルトンインスタンスを開放する
+     */
+    static void clearSingletonCache() {
+        synchronized (sSingletonStore) {
+            for (SingletonHolder holder : sSingletonStore.values()) {
+                holder.instance = null;
+            }
+        }
+    }
+
     static SingletonHolder getSingleton(Class clazz) {
         synchronized (sSingletonStore) {
             SingletonHolder result = sSingletonStore.get(clazz);

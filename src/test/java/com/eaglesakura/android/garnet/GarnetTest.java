@@ -6,7 +6,12 @@ import org.junit.Test;
 
 import android.content.Context;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 public class GarnetTest extends UnitTestCase {
 
@@ -35,7 +40,7 @@ public class GarnetTest extends UnitTestCase {
     }
 
     @Test
-    public void 名前でバインドしたPrivderを通してインスタンス化できる() {
+    public void 名前でバインドしたProviderを通してインスタンス化できる() {
         NamedInjectionTarget target = new NamedInjectionTarget();
         assertNull(target.mSayEng);
         assertNull(target.mSayJpn);
@@ -310,7 +315,18 @@ public class GarnetTest extends UnitTestCase {
         SaySingleton mSay1;
     }
 
+    @Singleton
     public static class SingletonNamedProvider implements Provider {
+
+        static int sCreatedCount;
+
+        public SingletonNamedProvider() {
+            synchronized (SingletonNamedProvider.class) {
+                // 一度しか生成されない
+                assertEquals(++sCreatedCount, 1);
+            }
+        }
+
         @Override
         public void onDependsCompleted(Object inject) {
 
