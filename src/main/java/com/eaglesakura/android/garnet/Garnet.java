@@ -13,8 +13,8 @@ public class Garnet {
     /**
      * 依存注入用のBuilderを生成する
      */
-    public static Builder create(@NonNull Object obj) {
-        return new Builder(obj);
+    public static <T> Builder<T> create(@NonNull T obj) {
+        return new Builder<>(obj);
     }
 
     /**
@@ -67,12 +67,12 @@ public class Garnet {
             mDependValues = mInjectionClassHolder.getDependValues(inject);
         }
 
-        public <T> Builder depend(Class<T> clazz, T value) {
+        public <T> Builder<DstType> depend(Class<T> clazz, T value) {
             mDependValues.put(ProviderClassHolder.makeName(clazz), value);
             return this;
         }
 
-        public <T> Builder depend(Class<T> clazz, String name, T value) {
+        public <T> Builder<DstType> depend(Class<T> clazz, String name, T value) {
             mDependValues.put(ProviderClassHolder.makeName(clazz, name), value);
             return this;
         }
