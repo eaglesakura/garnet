@@ -1,5 +1,7 @@
 package com.eaglesakura.android.garnet;
 
+import com.eaglesakura.android.garnet.error.InstanceCreateError;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +62,29 @@ class InternalUtils {
             } else {
                 return origin;
             }
+        }
+    }
+
+    static Provider newProvider(Class clazz) {
+        try {
+            Provider provider;
+            if (isSingleton(clazz)) {
+                // Provider自体にSingleton属性がある場合、Providerをキャッシュする
+                SingletonHolder singleton = InternalUtils.getSingleton(clazz);
+                synchronized (singleton) {
+                    if (singleton.instance == null) {
+                        singleton.instance = InternalUtils.getClass(clazz).newInstance();
+                    }
+                }
+                provider = (Provider) singleton.instance;
+            } else {
+                // 毎度Providerオブジェクトを生成する
+                provider = (Provider) InternalUtils.getClass(clazz).newInstance();
+            }
+
+            return provider;
+        } catch (Exception e) {
+            throw new InstanceCreateError(e);
         }
     }
 }

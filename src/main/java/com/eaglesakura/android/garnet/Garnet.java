@@ -2,6 +2,7 @@ package com.eaglesakura.android.garnet;
 
 import android.support.annotation.NonNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,13 @@ public class Garnet {
     public static <T> T inject(@NonNull T obj) {
         create(obj).inject();
         return obj;
+    }
+
+    /**
+     * １オブジェクトのみを扱うInstance Factoryを生成する
+     */
+    public static <T extends Provider> FactoryBuilder<T> factory(@NonNull Class<T> provider) {
+        return new FactoryBuilder<>(provider);
     }
 
     /**
@@ -67,11 +75,17 @@ public class Garnet {
             mDependValues = mInjectionClassHolder.getDependValues(inject);
         }
 
+        /**
+         * 依存引数を直接解決する
+         */
         public <T> Builder<DstType> depend(Class<T> clazz, T value) {
             mDependValues.put(ProviderClassHolder.makeName(clazz), value);
             return this;
         }
 
+        /**
+         * 依存引数を直接解決する
+         */
         public <T> Builder<DstType> depend(Class<T> clazz, String name, T value) {
             mDependValues.put(ProviderClassHolder.makeName(clazz, name), value);
             return this;
@@ -92,5 +106,67 @@ public class Garnet {
 
             return mInject;
         }
+    }
+
+    public static class FactoryBuilder<ProviderType extends Provider> {
+        final ProviderType mProvider;
+
+        /**
+         * Inject対象から取得した依存オブジェクト
+         */
+        final Map<String, Object> mDependValues = new HashMap<>();
+
+        Object mInject;
+
+        FactoryBuilder(Class<ProviderType> provider) {
+            mProvider = (ProviderType) InternalUtils.newProvider(provider);
+        }
+
+        /**
+         * Objectに付与されたDepend属性から取り出す
+         */
+        public FactoryBuilder<ProviderType> depend(Object inject) {
+            if (mInject != null) {
+                throw new IllegalStateException();
+            }
+
+            InjectionClassHolder injectionClassHolder = InjectionClassHolder.get(inject.getClass());
+            mDependValues.putAll(injectionClassHolder.getDependValues(inject));
+            mInject = inject;
+            return this;
+        }
+
+        /**
+         * 依存引数を直接解決する
+         */
+        public <T> FactoryBuilder<ProviderType> depend(Class<T> clazz, T value) {
+            mDependValues.put(ProviderClassHolder.makeName(clazz), value);
+            return this;
+        }
+
+        /**
+         * 依存引数を直接解決する
+         */
+        public <T> FactoryBuilder<ProviderType> depend(Class<T> clazz, String name, T value) {
+            mDependValues.put(ProviderClassHolder.makeName(clazz, name), value);
+            return this;
+        }
+
+        /**
+         * Providerに指定したClassのオブジェクトを生成させる
+         */
+        public <T> T instance(Class<T> clazz) {
+            return instance(clazz, null);
+        }
+
+        /**
+         * Providerに指定したClassのオブジェクトを生成させる
+         */
+        public <T> T instance(Class<T> clazz, String name) {
+            ProviderClassHolder holder = ProviderClassHolder.get(mProvider.getClass());
+            holder.setDepends(mInject, mProvider, mDependValues);
+            return (T) holder.getProvideObject(mProvider, ProviderClassHolder.makeName(clazz, name));
+        }
+
     }
 }

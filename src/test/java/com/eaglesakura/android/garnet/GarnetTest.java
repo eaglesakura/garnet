@@ -6,13 +6,6 @@ import org.junit.Test;
 
 import android.content.Context;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-
 public class GarnetTest extends UnitTestCase {
 
     @Test
@@ -118,6 +111,63 @@ public class GarnetTest extends UnitTestCase {
         fail();
     }
 
+
+    @Test
+    public void ProviderをFactoryとして扱える() throws Throwable {
+        Say say = Garnet.factory(SayProvider.class).instance(Say.class);
+        assertNotNull(say);
+        assertEquals(say.hello(), "hello");
+    }
+
+    @Test
+    public void ProviderをFactoryとして使った場合もオーバーライドが働く() throws Throwable {
+        try {
+            Garnet.override(SayProvider.class, SayJapaneseProvider.class);
+            Say say = Garnet.factory(SayProvider.class).instance(Say.class);
+            assertNotNull(say);
+            assertEquals(say.hello(), "こんにちは");
+        } finally {
+            Garnet.override(SayProvider.class, SayProvider.class);
+        }
+    }
+
+    @Test
+    public void ProviderをFactoryとして使った場合もシングルトンが働く() throws Throwable {
+        Say say0 = Garnet.factory(SingletonNamedProvider.class).instance(SaySingleton.class);
+        Say say1 = Garnet.factory(SingletonNamedProvider.class).instance(SaySingleton.class);
+        assertNotNull(say0);
+        assertNotNull(say1);
+        assertEquals(say0, say1);
+        assertTrue(say0 == say1);
+
+        assertEquals(say0.hello(), "singleton");
+    }
+
+    @Test
+    public void ProviderをFactoryとして使った場合も名前付きProvideを使用できる() throws Throwable {
+        Say say0 = Garnet.factory(NamedProvider.class).instance(Say.class, "jpn");
+        assertNotNull(say0);
+        assertEquals(say0.hello(), "こんにちは");
+    }
+
+
+    @Test
+    public void ProviderをFactoryとして使った場合もDependを使用できる() throws Throwable {
+        Say say0 = Garnet.factory(DependRequireSayProvider.class)
+                .depend(Context.class, getContext())
+                .instance(Say.class);
+        assertNotNull(say0);
+        assertNotEmpty(say0.hello());
+        assertNotEquals(say0.hello(), "");
+    }
+
+    @Test(expected = DependMethodNotFoundError.class)
+    public void ProviderをFactoryとして使った場合もDependが足りなければエラーとなる() throws Throwable {
+        Garnet.factory(DependRequireSayProvider.class)
+                .instance(Say.class);
+    }
+
+
     @Depend(name = "context2")
     @Override
     public Context getContext() {
@@ -198,7 +248,7 @@ public class GarnetTest extends UnitTestCase {
         }
 
         @Provide
-        Say provideSay() {
+        public Say provideSay() {
             return () -> "hello";
         }
     }

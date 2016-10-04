@@ -1,7 +1,6 @@
 package com.eaglesakura.android.garnet;
 
 import com.eaglesakura.android.garnet.error.InjectTargetError;
-import com.eaglesakura.android.garnet.error.InstanceCreateError;
 import com.eaglesakura.android.garnet.error.ProvideMethodError;
 
 import android.support.annotation.NonNull;
@@ -147,27 +146,7 @@ class InjectionClassHolder {
     List<Provider> newProviders() {
         List<Provider> result = new ArrayList<>();
         for (Class clazz : mProviders) {
-            try {
-
-                Provider provider;
-                if (InternalUtils.isSingleton(clazz)) {
-                    // Provider自体にSingleton属性がある場合、Providerをキャッシュする
-                    SingletonHolder singleton = InternalUtils.getSingleton(clazz);
-                    synchronized (singleton) {
-                        if (singleton.instance == null) {
-                            singleton.instance = InternalUtils.getClass(clazz).newInstance();
-                        }
-                    }
-                    provider = (Provider) singleton.instance;
-                } else {
-                    // 毎度Providerオブジェクトを生成する
-                    provider = (Provider) InternalUtils.getClass(clazz).newInstance();
-                }
-
-                result.add(provider);
-            } catch (Exception e) {
-                throw new InstanceCreateError(e);
-            }
+            result.add(InternalUtils.newProvider(clazz));
         }
         return result;
     }

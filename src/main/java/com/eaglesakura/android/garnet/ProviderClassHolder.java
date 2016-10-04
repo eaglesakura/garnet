@@ -183,7 +183,11 @@ class ProviderClassHolder {
     }
 
     static String makeName(@NonNull Class clazz, @NonNull String name) {
-        return clazz.getName() + "|" + name;
+        if (name == null) {
+            return clazz.getName() + "|";
+        } else {
+            return clazz.getName() + "|" + name;
+        }
     }
 
     private static Map<Class, ProviderClassHolder> sHolders = new HashMap<>();
