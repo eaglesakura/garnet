@@ -123,7 +123,7 @@ class ProviderClassHolder {
     /**
      * 依存オブジェクトを取得する
      */
-    Object getProvideObject(Provider provider, String name) {
+    Object getProvideObject(Object injectTarget, Provider provider, String name) {
         ProvideMethodHolder method = mProvideGetters.get(name);
         if (method == null) {
             // 指定されたProvideメソッドが見つからない
@@ -131,23 +131,34 @@ class ProviderClassHolder {
         }
 
         try {
+            boolean initialize = false;
+            Object result = null;
             if (method.singleton != null) {
                 // Classにシングルトンが指定されている
                 synchronized (method.singleton) {
                     if (method.singleton.instance == null) {
                         method.singleton.instance = method.method.invoke(provider);
+                        initialize = true;
 
                         // シングルトンの生成に失敗した
                         if (method.singleton.instance == null) {
                             throw new ProvideMethodError();
                         }
                     }
-                    return method.singleton.instance;
+                    result = method.singleton.instance;
                 }
             } else {
                 // 通常のProvide
-                return method.method.invoke(provider);
+                initialize = true;
+                result = method.method.invoke(provider);
             }
+
+            if (initialize) {
+                // 初期化を行わせる
+                InternalUtils.requestProvideInitialize(result, injectTarget);
+            }
+
+            return result;
         } catch (InvocationTargetException e) {
             throw new ProvideMethodError(e.getTargetException());
         } catch (Exception e) {

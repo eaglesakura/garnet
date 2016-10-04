@@ -165,7 +165,7 @@ public class Garnet {
         public <T> T instance(Class<T> clazz, String name) {
             ProviderClassHolder holder = ProviderClassHolder.get(mProvider.getClass());
             holder.setDepends(mInject, mProvider, mDependValues);
-            return (T) holder.getProvideObject(mProvider, ProviderClassHolder.makeName(clazz, name));
+            return (T) holder.getProvideObject(mInject, mProvider, ProviderClassHolder.makeName(clazz, name));
         }
 
     }

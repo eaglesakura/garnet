@@ -161,10 +161,10 @@ class InjectionClassHolder {
                 // invoke対象のProviderを見つけた
                 if (fieldHolder.field.getType().equals(Lazy.class)) {
                     // 遅延注入を行う
-                    ProviderInstance instance = () -> providerClassHolder.getProvideObject(provider, fieldHolder.name);
+                    ProviderInstance instance = () -> providerClassHolder.getProvideObject(inject, provider, fieldHolder.name);
                     fieldHolder.field.set(inject, new LazyImpl(instance));
                 } else {
-                    Object provideObject = providerClassHolder.getProvideObject(provider, fieldHolder.name);
+                    Object provideObject = providerClassHolder.getProvideObject(inject, provider, fieldHolder.name);
                     fieldHolder.field.set(inject, provideObject);
                 }
             } catch (Exception e) {
