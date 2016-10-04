@@ -419,9 +419,26 @@ public class GarnetTest extends UnitTestCase {
         }
 
         static class SingletonSay implements SaySingleton {
+
+            static int sInitializeCount;
+
+            String mText;
+
+            /**
+             * Initializerは一度しか呼ばれないはずである
+             */
+            @Initializer
+            public void initialize() {
+                ++sInitializeCount;
+                assertEquals(sInitializeCount, 1);
+
+                mText = "singleton";
+            }
+
             @Override
             public String hello() {
-                return "singleton";
+                assertEquals(sInitializeCount, 1);
+                return mText;
             }
         }
 
