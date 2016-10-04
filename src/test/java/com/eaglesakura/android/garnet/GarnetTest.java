@@ -237,6 +237,8 @@ public class GarnetTest extends UnitTestCase {
 
     public static class SayProvider implements Provider {
 
+        String mHelloText;
+
         @Override
         public void onDependsCompleted(Object inject) {
 
@@ -249,7 +251,31 @@ public class GarnetTest extends UnitTestCase {
 
         @Provide
         public Say provideSay() {
-            return () -> "hello";
+            return new SayObject();
+        }
+
+        static class SayObject implements Say {
+            String mText;
+
+            String mText2;
+
+            @Initializer
+            public void initialize() {
+                mText = "he";
+            }
+
+            @Initializer
+            public void initialize(Object injectTarget) {
+                if (injectTarget != null) {
+                    assertEquals(injectTarget.getClass(), SimpleInjectionTarget.class);
+                }
+                mText2 = "llo";
+            }
+
+            @Override
+            public String hello() {
+                return mText + mText2;
+            }
         }
     }
 

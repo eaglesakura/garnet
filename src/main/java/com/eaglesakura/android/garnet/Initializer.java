@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
  * このメソッドは引数なし、もしくはObject型を一つとる（Inject対象のオブジェクトが渡される）必要がある。
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
+@Target({ElementType.METHOD})
 public @interface Initializer {
 }
