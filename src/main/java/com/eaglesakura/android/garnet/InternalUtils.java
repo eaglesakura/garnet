@@ -7,7 +7,20 @@ import java.util.Map;
 
 class InternalUtils {
 
+    /**
+     * シングルトンオブジェクトをキャッシュする
+     */
     private static final Map<Class, SingletonHolder> sSingletonStore = new HashMap<>();
+
+    /**
+     * 動的に実装を切り替える場合のファクトリ
+     */
+    private static final Map<Class, Class> sOverrideClasses = new HashMap<>();
+
+    /**
+     * Provide後の処理を行うためのキャッシュ
+     */
+    private static final Map<Class, ProvideTargetClassHolder> sProvideTargetClasses = new HashMap<>();
 
     /**
      * シングルトン属性である場合はtrue
@@ -43,11 +56,6 @@ class InternalUtils {
         }
     }
 
-    /**
-     * 動的に実装を切り替える場合のファクトリ
-     */
-    private static final Map<Class, Class> sOverrideClasses = new HashMap<>();
-
     static void override(Class origin, Class stead) {
         synchronized (sOverrideClasses) {
             sOverrideClasses.put(origin, stead);
@@ -63,6 +71,28 @@ class InternalUtils {
                 return origin;
             }
         }
+    }
+
+    /**
+     * ProviderによってProvideされたオブジェクトを初期化する
+     */
+    static Object requestProvideInitialize(Object provided, Object injectTarget) {
+        if (provided == null) {
+            // 初期化不可能
+            return null;
+        }
+
+        ProvideTargetClassHolder holder;
+        synchronized (sProvideTargetClasses) {
+            holder = sProvideTargetClasses.get(provided.getClass());
+            if (holder == null) {
+                holder = new ProvideTargetClassHolder(provided.getClass());
+                sProvideTargetClasses.put(provided.getClass(), holder);
+            }
+        }
+
+        holder.initialize(provided, injectTarget);
+        return provided;
     }
 
     static Provider newProvider(Class clazz) {
