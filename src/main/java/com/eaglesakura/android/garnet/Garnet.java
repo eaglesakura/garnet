@@ -34,6 +34,16 @@ public class Garnet {
     }
 
     /**
+     * インスタンスを直接生成する
+     *
+     * @param providerClass 生成を移譲するProvider
+     * @param instanceClass 生成するclass
+     */
+    public static <T> T instance(@NonNull Class<? extends Provider> providerClass, @NonNull Class<T> instanceClass) {
+        return factory(providerClass).instance(instanceClass);
+    }
+
+    /**
      * Providerを強制的に切り替える
      *
      * @param origin 元のClass
