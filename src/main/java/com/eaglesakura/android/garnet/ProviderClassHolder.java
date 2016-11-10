@@ -127,7 +127,7 @@ class ProviderClassHolder {
         ProvideMethodHolder method = mProvideGetters.get(name);
         if (method == null) {
             // 指定されたProvideメソッドが見つからない
-            throw new ProvideMethodNotFoundError(name);
+            throw new ProvideMethodNotFoundError("Inject[" + name + "] Provider[" + provider.getClass().getName() + "]");
         }
 
         try {
