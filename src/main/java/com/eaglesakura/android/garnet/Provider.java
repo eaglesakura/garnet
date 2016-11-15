@@ -1,5 +1,8 @@
 package com.eaglesakura.android.garnet;
 
+import android.support.annotation.Keep;
+
+@Keep
 public interface Provider<SourceType> {
 
     /**
