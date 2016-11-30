@@ -5,6 +5,8 @@
  * 劣化Daggerだが。
  * 簡易的にオブジェクトの依存関係を構築する
  * テスト時に依存関係を上書きすることができる
+ * 利用方法
+  * http://qiita.com/eaglesakura/items/33bfc0eb65050826deeb
  
 
 ## プロジェクト設定
@@ -19,7 +21,7 @@ repositories {
 
 dependencies {
     // add library
-    compile 'com.eaglesakura:garnet:0.1.+'
+    compile 'com.eaglesakura:garnet:0.3.+'
 }
 ```
 
