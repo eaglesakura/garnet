@@ -42,18 +42,18 @@ dependencies {
     /**
      * support libs
      */
-    compile "com.android.support:support-v4:25.3.1"
+    implementation "com.android.support:support-v4:25.3.1"
 
     if (EGLIBRARY_COMPILE_LOCAL) {
-        testCompile project(":eglibrary:android-unittest-support")
+        testImplementation project(":eglibrary:android-unittest-support")
 
-        androidTestCompile project(":eglibrary:android-commons")
-        androidTestCompile project(":eglibrary:android-devicetest-support")
+        androidTestImplementation project(":eglibrary:android-commons")
+        androidTestImplementation project(":eglibrary:android-devicetest-support")
     } else {
-        testCompile "com.eaglesakura:android-unittest-support:1.4.207"
+        testImplementation "com.eaglesakura:android-unittest-support:1.4.207"
 
-        androidTestCompile "com.eaglesakura:android-commons:2.1.3"
-        androidTestCompile "com.eaglesakura:android-devicetest-support:2.1.272"
+        androidTestImplementation "com.eaglesakura:android-commons:2.1.3"
+        androidTestImplementation "com.eaglesakura:android-devicetest-support:2.1.272"
     }
 }
 
