@@ -20,7 +20,7 @@ buildscript {
         maven { url "https://maven.google.com" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha1'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
@@ -44,7 +44,7 @@ dependencies {
     /**
      * support libs
      */
-    compile "com.android.support:support-v4:25.3.1"
+    implementation "com.android.support:support-v4:25.3.1"
 
     if (EGLIBRARY_COMPILE_LOCAL) {
         testImplementation project(":eglibrary:android-unittest-support")
@@ -52,10 +52,10 @@ dependencies {
         androidTestImplementation project(":eglibrary:android-commons")
         androidTestImplementation project(":eglibrary:android-devicetest-support")
     } else {
-        testCompile "com.eaglesakura:android-unittest-support:1.5.211"
+        testImplementation "com.eaglesakura:android-unittest-support:1.5.211"
 
-        androidTestCompile "com.eaglesakura:android-commons:2.2.11"
-        androidTestCompile "com.eaglesakura:android-devicetest-support:2.2.275"
+        androidTestImplementation "com.eaglesakura:android-commons:2.2.11"
+        androidTestImplementation "com.eaglesakura:android-devicetest-support:2.2.275"
     }
 }
 
