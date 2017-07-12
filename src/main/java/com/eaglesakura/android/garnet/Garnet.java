@@ -60,6 +60,13 @@ public class Garnet {
         InternalUtils.clearSingletonCache();
     }
 
+    /**
+     * {@link Garnet#override(Class, Class)} でオーバーライドしたProvider情報をすべて削除する
+     */
+    public static void clearOverrideMapping() {
+        InternalUtils.clearOverrideMapping();
+    }
+
     public static class Builder<DstType> {
         final InjectionClassHolder mInjectionClassHolder;
 

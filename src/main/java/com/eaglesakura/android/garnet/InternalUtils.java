@@ -45,6 +45,15 @@ class InternalUtils {
         }
     }
 
+    /**
+     * 保持しているProviderオーバーライドマッピングを開放する
+     */
+    static void clearOverrideMapping() {
+        synchronized (sOverrideClasses) {
+            sOverrideClasses.clear();
+        }
+    }
+
     static SingletonHolder getSingleton(Class clazz) {
         synchronized (sSingletonStore) {
             SingletonHolder result = sSingletonStore.get(clazz);

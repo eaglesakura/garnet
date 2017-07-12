@@ -260,12 +260,12 @@ public class GarnetTest extends UnitTestCase {
             String mText2;
 
             @Initializer
-            public void initialize() {
+            void initialize() {
                 mText = "he";
             }
 
             @Initializer
-            public void initialize(Object injectTarget) {
+            void initialize(Object injectTarget) {
                 if (injectTarget != null) {
                     assertEquals(injectTarget.getClass(), SimpleInjectionTarget.class);
                 }
@@ -428,7 +428,7 @@ public class GarnetTest extends UnitTestCase {
              * Initializerは一度しか呼ばれないはずである
              */
             @Initializer
-            public void initialize() {
+            void initialize() {
                 ++sInitializeCount;
                 assertEquals(sInitializeCount, 1);
 

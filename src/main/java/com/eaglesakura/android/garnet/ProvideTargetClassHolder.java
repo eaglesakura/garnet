@@ -17,7 +17,7 @@ class ProvideTargetClassHolder {
     ProvideTargetClassHolder(Class clazz) {
         mClazz = clazz;
 
-        for (Method method : mClazz.getMethods()) {
+        for (Method method : mClazz.getDeclaredMethods()) {
             Initializer annotation = method.getAnnotation(Initializer.class);
             if (annotation == null) {
                 continue;
@@ -37,6 +37,7 @@ class ProvideTargetClassHolder {
 
         try {
             for (Method method : mInitializers) {
+                method.setAccessible(true);
                 if (method.getParameterTypes().length == 0) {
                     method.invoke(provideObject);
                 } else {
