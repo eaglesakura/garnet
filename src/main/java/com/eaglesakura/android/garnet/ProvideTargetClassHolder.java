@@ -16,6 +16,7 @@ class ProvideTargetClassHolder {
 
     ProvideTargetClassHolder(Class clazz) {
         mClazz = clazz;
+        mInitializers.addAll(InternalUtils.listAnnotationMethods(mClazz, Initializer.class));
 
         for (Method method : mClazz.getDeclaredMethods()) {
             Initializer annotation = method.getAnnotation(Initializer.class);
